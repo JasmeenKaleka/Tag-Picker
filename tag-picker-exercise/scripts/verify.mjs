@@ -1,4 +1,4 @@
-﻿import assert from "node:assert/strict";
+import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createServer } from "vite";
 import { createElement } from "react";
@@ -10,6 +10,27 @@ try {
   const { TagPicker } = await server.ssrLoadModule("/src/TagPicker.tsx");
   const tags = await server.ssrLoadModule("/src/lib/tags.ts");
   const { SKILLS, MORE_SKILLS, RECOMMENDATIONS } = await server.ssrLoadModule("/src/data.ts");
+  const { SkillIcon, SKILL_BRAND_ICONS } = await server.ssrLoadModule("/src/SkillIcon.tsx");
+  for (const { asset } of Object.values(SKILL_BRAND_ICONS)) {
+    const svg = fs.readFileSync(`public/skill-icons/${asset}.svg`, "utf8");
+    assert(svg.includes("<svg"));
+    assert(!svg.includes("<script"));
+  }
+  for (const skill of ["Figma", "React", "TypeScript", "Storybook", "Webflow"]) {
+    const icon = renderToStaticMarkup(createElement(SkillIcon, { skill }));
+    assert(icon.includes(`/skill-icons/${skill.toLowerCase()}.svg`));
+    assert(icon.includes('aria-hidden="true"'));
+    assert(icon.includes('alt=""'));
+  }
+  assert(renderToStaticMarkup(createElement(SkillIcon, { skill: "  TYPESCRIPT " })).includes("/skill-icons/typescript.svg"));
+  const categories = [...new Set([...SKILLS, ...MORE_SKILLS].map(o => o.category)), "Other / Custom"];
+  const fallbacks = categories.map(category => renderToStaticMarkup(createElement(SkillIcon, { skill: "Unbranded skill", category })));
+  assert.equal(new Set(fallbacks).size, categories.length, "Every category needs a distinct fallback");
+  assert(fallbacks.every(markup => markup.includes("<svg") && !markup.includes("<img")));
+  assert(renderToStaticMarkup(createElement(SkillIcon, { skill: "constructor" })).includes("lucide-tag"));
+  const selectedBrands = renderToStaticMarkup(createElement(TagPicker, { options: SKILLS, defaultValue: ["TypeScript", "Storybook", "Webflow"] }));
+  for (const asset of ["typescript", "storybook", "webflow"]) assert(selectedBrands.includes(`/skill-icons/${asset}.svg`));
+  console.log("PASS: brand assets, normalized icon lookup, all distinct category fallbacks, custom fallback, and selected-card integration.");
   const html = renderToStaticMarkup(createElement(App));
   assert(html.includes("<h1>Tag Picker</h1>"));
   const sections = ["Find Skills", "Selected Skills", "Suggested Skills", "Discover More Skills"];

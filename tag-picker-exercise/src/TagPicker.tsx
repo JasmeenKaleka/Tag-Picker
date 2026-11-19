@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from "react";
-import { Atom, Braces, Check, Compass, Layers, Monitor, Plus, Search, Sparkles, X } from "lucide-react";
+import { SkillIcon } from "./SkillIcon";
+import { Check, Compass, Layers, Monitor, Plus, Search, Sparkles, X } from "lucide-react";
 import { canonicalTagFor, fitTagAdditions, matchTagOptions, recommendTags, tagSlug, type TagOption, type TagRecommendations } from "./lib/tags";
 
 type Option = string | TagOption;
@@ -127,7 +128,7 @@ export function TagPicker({ options, searchOptions = [], name, value, defaultVal
     </section>
     <section className="selected-section" aria-labelledby={`${id}-selected`}>
       <div className="section-heading"><h2 id={`${id}-selected`} className="section-title"><span className="section-icon" aria-hidden="true"><Layers size={18} /></span><span>Selected Skills</span></h2><span className="selection-count" aria-label={`${selected.length}${maxSkills !== undefined ? ` of ${maxSkills}` : ""} skills selected`}>{selected.length}{maxSkills !== undefined ? ` / ${maxSkills}` : ""}</span></div>
-      {selected.length ? <div className="selected-grid">{selected.map(tag => <div className="selected-skill" key={tag}><span className={`skill-emblem ${tagSlug(tag) === "react" ? "react-emblem" : ""}`} aria-hidden="true">{tagSlug(tag) === "figma" ? <svg width="19" height="26" viewBox="0 0 18 27" fill="none"><path d="M4.5 27A4.5 4.5 0 0 1 0 22.5 4.5 4.5 0 0 1 4.5 18H9v4.5A4.5 4.5 0 0 1 4.5 27Z" fill="#0ACF83"/><path d="M0 13.5A4.5 4.5 0 0 1 4.5 9H9v9H4.5A4.5 4.5 0 0 1 0 13.5Z" fill="#A259FF"/><path d="M0 4.5A4.5 4.5 0 0 1 4.5 0H9v9H4.5A4.5 4.5 0 0 1 0 4.5Z" fill="#F24E1E"/><path d="M9 0h4.5a4.5 4.5 0 0 1 0 9H9V0Z" fill="#FF7262"/><circle cx="13.5" cy="13.5" r="4.5" fill="#1ABCFE"/></svg> : tagSlug(tag) === "react" ? <Atom size={24} /> : <Braces size={20} />}</span><div className="selected-label"><strong>{labelFor(tag)}</strong><span>{categoryFor(tag)}</span></div><button type="button" className="icon-button" onClick={() => remove(tag)} aria-label={`Remove ${labelFor(tag)}`}><X size={15} aria-hidden="true" /></button></div>)}</div> : <p className="empty-state">No skills yet. Search or choose one below.</p>}
+      {selected.length ? <div className="selected-grid">{selected.map(tag => <div className="selected-skill" key={tag}><SkillIcon skill={tag} category={categoryFor(tag)} /><div className="selected-label"><strong>{labelFor(tag)}</strong><span>{categoryFor(tag)}</span></div><button type="button" className="icon-button" onClick={() => remove(tag)} aria-label={`Remove ${labelFor(tag)}`}><X size={15} aria-hidden="true" /></button></div>)}</div> : <p className="empty-state">No skills yet. Search or choose one below.</p>}
       <p id={`${id}-status`} role="status" className="status">{message || (atLimit ? `Limit reached. Remove a skill to add another.` : "")}</p>
     </section>
     </div>
